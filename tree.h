@@ -81,21 +81,60 @@ private:
 
         int check_win()
         {
-            for (auto elem: win_comb)
+            auto check_line = [this](int step, int situation = 3) -> bool
             {
-                if (array[elem[0]] == turn &&
-                        array[elem[1]] == turn &&
-                        array[elem[2]] == turn)
+                // 1) \ диагональ 2) / диагональ 3) | вертикаль 4) - горизонталь
+                int counter = -1; //тк точка считается 2 раза при чеке
+
+                int index = changed_items_index;
+                // чекаем первую диагональ
+                while (index >= 0)
                 {
-                    return 1;
-                } else if (array[elem[0]] == opposite_turn &&
-                           array[elem[1]] == opposite_turn &&
-                           array[elem[2]] == opposite_turn)
-                {
-                    return -1;
+                    if (array[index] == current_turn) counter++;
+                    else break;
+                    if (situation == 1 || situation == 4)
+                    {
+                        if (index % NROOT == 0)//чек на краевую точку
+                            break;
+                    } else if (situation == 2)
+                    {
+                        if ((index + 1) % NROOT == 0)//чек на краевую точку
+                            break;
+                    }
+                    index -= step;
                 }
-            }
-            return 0;
+                index = changed_items_index;
+                while (index < N)
+                {
+                    if (array[index] == current_turn) counter++;
+                    else break;
+
+                    if (situation == 1 || situation == 4)
+                    {
+                        if ((index + 1) % NROOT == 0)//чек на краевую точку
+                            break;
+                    } else if (situation == 2)
+                    {
+                        if (index % NROOT == 0)//чек на краевую точку
+                            break;
+                    }
+                    index += step;
+                }
+
+                return (counter >= 3);
+            };
+
+
+//            int res = (check_line(1, 4) || check_line(4, 2) || check_line(5) || check_line(6, 1)); // для 5 на 5
+//            int res = (check_line(1, 4) || check_line(3, 2) || check_line(4) || check_line(5, 1)); // для 4 на 4
+            int res = (check_line(1, 4) || check_line(2, 2) || check_line(3) || check_line(4, 1));
+            if (current_turn == turn && res)
+                return 1;
+            else if (current_turn == opposite_turn && res)
+                return -1;
+            else return 0;
+
+
         }
 
 
